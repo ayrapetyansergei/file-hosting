@@ -1,0 +1,27 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>File-Hosting</title>
+</head>
+
+<body>
+  <h1>File Hosting</h1>
+  {% if metadata != [] %}
+    <ul>
+      {% for meta in metadata %}
+      <li><p><b>name:</b> {{ meta['filename'] }}<br><b>publication datetime:</b> {{meta['date_time']}}</p></li><br>
+      {% endfor %}
+    </ul>
+  {% else %}
+  <p>File list is empty</p>
+  {% endif %}
+  
+  <form action="" method="post">
+   <p>
+    <input type="submit" value="Add"></p>
+  </form>
+
+</body>
+</html>
