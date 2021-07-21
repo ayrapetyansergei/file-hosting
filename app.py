@@ -25,15 +25,15 @@ def upload_file():
 	if request.method == 'POST':
 		f = request.files['file']
 		filename=secure_filename(f.filename)
-		f.save(os.path.join('/home/serj/Desktop/file-hosting/storage', filename))
+		f.save(os.path.join(os.getenv('APP_STORAGE'), filename))
 		return redirect(url_for('index', filename=filename, date_time=str(datetime.datetime.now())))
 	else:
 		return render_template('upload_file.html')
 
 @app.route('/uploads/<filename>')
 def save_file(filename):
-	return send_from_directory('/home/serj/Desktop/file-hosting/storage', filename)
+	return send_from_directory(os.getenv('APP_STORAGE'), filename)
 
 
 if __name__ == '__main__':
-	app.run()
+	app.run(host="0.0.0.0", port=os.getenv('APP_PORT'))
