@@ -9,17 +9,27 @@ services:
       - APP_STORAGE=${APP_STORAGE}
     ports:
       - ${APP_EXT_PORT}:${APP_PORT}
-    links:
-      - mongodb
     depends_on:
       - mongodb
   
   mongodb:
-    image: mongo:4.0
-    hostname: mongo_db
+    image: mongo:5.0
     environment:
       - MONGO_INITDB_ROOT_DATABASE=metadata
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=password
     ports:
       - 27017:27017
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 127.0.0.1:7081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_BASICAUTH_USERNAME: root
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+      ME_CONFIG_MONGODB_SERVER: mongodb
+
