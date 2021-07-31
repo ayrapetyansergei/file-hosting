@@ -2,48 +2,30 @@ import os
 import datetime
 from flask import Flask, request, render_template, redirect, url_for
 from flask import send_from_directory
-#from flask_pymongo import PyMongo
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
-
+import config
 
 app = Flask(__name__)
-app.config['DEBUG'] = True
-#app.config["MONGO_URI"] = "mongodb://root:example@localhost:27017/metadata"
-#mongodb_client = PyMongo(app)
-#db = mongodb_client.db
-metadata = list()
-#db.metadata.insert_one({'sdc':123})
-client = MongoClient(host='mongodb',
-					 port=27017,
-					 username='root',
-					 password='password')
+
+#Add config parameters
+app.config.from_object('config.DevelopConfig')
+
+#MongoDB connection
+client = MongoClient(host=config.DevelopConfig.MONGO_HOST,
+					 port=config.DevelopConfig.MONGO_PORT,
+					 username=config.DevelopConfig.MONGO_USERNAME,
+					 password=config.DevelopConfig.MONGO_PASSWORD)
 db=client['metadata']
-#collection = db['metadata_tb']
-print(dir(db.metadata_tb))#.insert_one({'1':1, '2':2})
-print(db.metadata_tb)#.insert_one({'1':1, '2':2})
-# db['images'].insert_one({'datetime':str(datetime.datetime.now())})# for _ in range(5)]
-
-# print(db) 
-# print(db['images'].find({}))# for _ in range(5)]
-
-
 
 @app.route('/', methods=['GET', 'POST'])
-def index(filename=None, date_time=None):
-	global metadata
+def index():
 	if request.method == 'POST':
-		filename = request.args.get('filename', None)
-		date_time = request.args.get('date_time', None)
-		if not(filename is None) and not(date_time is None):
-			#db.metadata.insert_one({'filename':filename, 'date_time':date_time})
-			metadata.append({'filename':filename, 'date_time':date_time})
 		return redirect('/upload')
-	#print(db.metadata.find())
-	#metadata = [m for m in db.metadata.find({})]
-	#print(metadata)
-	db.metadata_tb.insert_one({'datetime':str(datetime.datetime.now())})
-	return render_template('index.html', metadata=metadata)
+
+	print(db.metadata_tb.find({}))
+	print(dir(db.metadata_tb.find({})))
+	return render_template('index.html', metadata=list(db.metadata_tb.find({})))
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
@@ -52,8 +34,9 @@ def upload_file():
 		filename=secure_filename(f.filename)
 		f.save(os.path.join(os.getenv('APP_STORAGE'), filename))
 		date_time = str(datetime.datetime.now())
-		# db.metadata.insert_one({'filename':filename, 'date_time':date_time})
-		return redirect(url_for('index', filename=filename, date_time=date_time))
+		db.metadata_tb.insert_one({'filename':filename, 'date_time':date_time})
+		print(db.metadata_tb.find({}))
+		return redirect(url_for('index'))
 	else:
 		return render_template('upload_file.html')
 
