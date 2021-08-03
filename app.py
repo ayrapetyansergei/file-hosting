@@ -13,7 +13,7 @@ app.config.from_object('config.DevelopConfig')
 
 #MongoDB connection
 client = MongoClient(host=config.DevelopConfig.MONGO_HOST,
-					 port=config.DevelopConfig.MONGO_PORT,
+					 port=int(config.DevelopConfig.MONGO_PORT),
 					 username=config.DevelopConfig.MONGO_USERNAME,
 					 password=config.DevelopConfig.MONGO_PASSWORD)
 db=client['metadata']
