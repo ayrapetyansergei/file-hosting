@@ -9,6 +9,7 @@ load_dotenv(os.path.join(base_dir, '.env'))
 class BaseConfig:
 	#App config
 	APP_PORT = os.environ.get('APP_PORT', 8001)
+	APP_STORAGE = os.environ.get('APP_STORAGE')
 
 	#MongoDB config
 	MONGO_HOST = os.environ.get('MONGO_HOST', 'mongodb')
@@ -17,7 +18,7 @@ class BaseConfig:
 	MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD', 'password')
 
 class DevelopConfig(BaseConfig):
-	APP_DEBUG = True
+	DEBUG = True
 
 class ProductionConfig(BaseConfig):
-	APP_DEBUG = False
+	DEBUG = False

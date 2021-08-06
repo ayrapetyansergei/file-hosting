@@ -22,9 +22,6 @@ db=client['metadata']
 def index():
 	if request.method == 'POST':
 		return redirect('/upload')
-
-	print(db.metadata_tb.find({}))
-	print(dir(db.metadata_tb.find({})))
 	return render_template('index.html', metadata=list(db.metadata_tb.find({})))
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -35,10 +32,8 @@ def upload_file():
 		f.save(os.path.join(os.getenv('APP_STORAGE'), filename))
 		date_time = str(datetime.datetime.now())
 		db.metadata_tb.insert_one({'filename':filename, 'date_time':date_time})
-		print(db.metadata_tb.find({}))
 		return redirect(url_for('index'))
-	else:
-		return render_template('upload_file.html')
+	return render_template('upload_file.html')
 
 @app.route('/uploads/<filename>')
 def save_file(filename):
@@ -46,4 +41,4 @@ def save_file(filename):
 
 
 if __name__ == '__main__':
-	app.run(host="0.0.0.0", port=os.getenv('APP_PORT'))
+	app.run(host="0.0.0.0", port=config.DevelopConfig.APP_PORT)
