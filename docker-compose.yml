@@ -7,6 +7,7 @@ services:
     environment:
       - APP_PORT=${APP_PORT}
       - APP_STORAGE=${APP_STORAGE}
+      
     ports:
       - ${APP_EXT_PORT}:${APP_PORT}
     depends_on:
