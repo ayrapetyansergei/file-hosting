@@ -1,31 +1,31 @@
 import os
 import datetime
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Blueprint
+from flask import request, render_template, redirect, url_for
 from flask import send_from_directory
-from pymongo import MongoClient
 from werkzeug.utils import secure_filename
+from pymongo import MongoClient
 import config
-
-app = Flask(__name__)
-
-#Add config parameters
-app.config.from_object('config.DevelopConfig')
 
 #MongoDB connection
 client = MongoClient(host=config.DevelopConfig.MONGO_HOST,
-					 port=config.DevelopConfig.MONGO_PORT,
-					 username=config.DevelopConfig.MONGO_USERNAME,
-					 password=config.DevelopConfig.MONGO_PASSWORD)
+				port=config.DevelopConfig.MONGO_PORT,
+				username=config.DevelopConfig.MONGO_USERNAME,
+				password=config.DevelopConfig.MONGO_PASSWORD)
 db=client['metadata']
 
-@app.route('/', methods=['GET', 'POST'])
+main_bp = Blueprint(
+    "main_bp", __name__, template_folder="templates"
+)
+
+@main_bp.route('/', methods=['GET', 'POST'])
 def index():
 	if request.method == 'POST':
 		return redirect('/upload')
 	skip_counter = db.metadata_tb.count() - 10 if db.metadata_tb.count() > 10 else 0
 	return render_template('index.html', metadata=list(db.metadata_tb.find().skip(skip_counter)))
 
-@app.route('/upload', methods=['GET', 'POST'])
+@main_bp.route('/upload', methods=['GET', 'POST'])
 def upload_file():
 	if request.method == 'POST':
 		f = request.files['file']
@@ -33,13 +33,9 @@ def upload_file():
 		f.save(os.path.join(config.DevelopConfig.APP_STORAGE, filename))
 		date_time = str(datetime.datetime.now())
 		db.metadata_tb.insert_one({'filename':filename, 'date_time':date_time})
-		return redirect(url_for('index'))
+		return redirect(url_for('main_bp.index'))
 	return render_template('upload_file.html')
 
-@app.route('/uploads/<filename>')
+@main_bp.route('/uploads/<filename>')
 def save_file(filename):
 	return send_from_directory(config.DevelopConfig.APP_STORAGE, filename)
-
-
-if __name__ == '__main__':
-	app.run(host="0.0.0.0", port=config.DevelopConfig.APP_PORT)

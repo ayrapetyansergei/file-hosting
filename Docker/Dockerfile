@@ -5,4 +5,4 @@ COPY ./requirements.txt /opt/file-hosting/requirements.txt
 RUN pip3 install -r /opt/file-hosting/requirements.txt
 COPY . /opt/file-hosting/
 
-CMD ["python3", "/opt/file-hosting/app.py"]
+CMD ["python3", "/opt/file-hosting/wsgi.py"]
